@@ -298,23 +298,6 @@ Recommend **Agile/Iterative**:
 
 ---
 
-## Support & Troubleshooting
-
-### Common Issues
-
-**Issue:** "ModuleNotFoundError: No module named 'streamlit'"  
-**Solution:** Run `pip install -r requirements_enhanced.txt`
-
-**Issue:** "File not found: F1_1_Air_Releases_National.csv"  
-**Solution:** Ensure CSV is in same directory as enhanced_app.py
-
-**Issue:** Dashboard loads but charts are empty  
-**Solution:** Check that CSV has data, select at least one country and pollutant
-
-**Issue:** Streamlit Cloud deployment fails  
-**Solution:** Rename requirements_enhanced.txt → requirements.txt before deploying
-
----
 
 ## Contact & Credits
 

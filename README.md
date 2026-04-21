@@ -319,10 +319,3 @@ Recommend **Agile/Iterative**:
 ## Contact & Credits
 
 **Dataset Source:** European Environment Agency (EEA)  
-**License:** EEA standard re-use policy (free for educational use)  
-**Dashboard Framework:** Streamlit (Apache 2.0 License)  
-**Visualization Library:** Plotly (MIT License)
-
-**Course:** 5DATA004C Data Science Project Lifecycle  
-**Institution:** University of Westminster  
-**Submission Date:** 28th April 2026

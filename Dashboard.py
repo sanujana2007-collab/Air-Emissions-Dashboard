@@ -14,10 +14,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
-# =========================
-# FIX: FORCE BLACK TEXT IN ALL BOXES
-# =========================
+#styling
 st.markdown("""
 <style>
 

@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional CSS with WHITE HEADINGS and NEAT KPI BOXES
+# CSS 
 st.markdown("""
 <style>
 /* ===============================

@@ -9,101 +9,365 @@ from scipy import stats
 
 # Page configuration
 st.set_page_config(
-    page_title="Air Emissions Dashboard",
-    page_icon="🌍",
+    page_title="European Air Emissions Dashboard",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
-#styling
+
+# Professional CSS with WHITE HEADINGS and NEAT KPI BOXES
 st.markdown("""
 <style>
+/* ===============================
+   GLOBAL STYLES
+================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* Fix metric text contrast */
-div[data-testid="stMetricValue"] {
-    color: #2d3748 !important;
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
 }
 
+.main {
+    background-color: #f5f7fa;
+}
+
+/* remove streamlit padding */
+.block-container {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* ===============================
+   HEADINGS - ALL WHITE
+================================= */
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* ===============================
+   DASHBOARD HEADER (TOP TITLE BOX)
+================================= */
+.dashboard-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+}
+
+.dashboard-title {
+    color: #ffffff !important;
+    font-size: 2.4rem;
+    font-weight: 800;
+}
+
+.dashboard-subtitle {
+    color: rgba(255,255,255,0.9) !important;
+}
+
+/* ===============================
+   SECTION HEADINGS WITH GRADIENT BACKGROUND
+================================= */
+.dashboard-header {
+    background: transparent !important;   /* removes blue box */
+    box-shadow: none !important;          /* removes glow/shadow */
+    padding: 1rem 0;
+    border-radius: 0;
+}
+.section-title {
+    color: #ffffff !important;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* ===============================
+   KPI / KEY PERFORMANCE INDICATORS BOXES
+   NEAT WHITE CARDS WITH BORDER
+================================= */
+
+/* ================================
+   KPI CARDS (WHITE + PERFECT CENTER)
+================================= */
+
+/* CARD BOX */
+div[data-testid="stMetric"] {
+    background: #ffffff !important;
+    border-radius: 14px;
+    padding: 18px 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 1px solid #e5e7eb;
+
+    /* CENTER FIX */
+    display: flex !important;
+    flex-direction: column;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* FORCE INNER CONTENT CENTER */
+div[data-testid="stMetric"] > div {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* LABEL */
 div[data-testid="stMetricLabel"] {
-    color: #4a5568 !important;
+    font-size: 0.75rem !important;
+    color: #6b7280 !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    margin-bottom: 6px;
 }
 
+/* VALUE */
+div[data-testid="stMetricValue"] {
+    font-size: 1.6rem !important;
+    font-weight: 700 !important;
+    color: #111827 !important;
+
+    text-align: center !important;
+
+    /* prevent overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* DELTA */
 div[data-testid="stMetricDelta"] {
-    font-weight: 600;
+    font-size: 0.75rem !important;
+    text-align: center !important;
 }
 
-/* Insight cards – force proper contrast */
+/* REMOVE DEFAULT LEFT ALIGNMENTS */
+[data-testid="stMetric"] label,
+[data-testid="stMetric"] p {
+    text-align: center !important;
+}
+/* ===============================
+   INSIGHT CARDS - 4 NEAT BOXES
+================================= */
 .insight-card {
-    background: white !important;
-    color: #2d3748 !important;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-top: 5px solid;
+    transition: all 0.3s ease;
+    height: 100%;
+    min-height: 180px;
 }
 
-/* Title (small grey text) */
+.insight-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+.insight-card-success { border-top-color: #10b981; }
+.insight-card-warning { border-top-color: #f59e0b; }
+.insight-card-danger { border-top-color: #ef4444; }
+.insight-card-info { border-top-color: #3b82f6; }
+
+.insight-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+    color: #ffffff;
+}
+
+.icon-success { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+.icon-warning { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.icon-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+.icon-info { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
+
 .insight-title {
-    color: #4a5568 !important;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
 }
 
-/* Big value (main number) */
 .insight-value {
-    color: #1a202c !important;
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    line-height: 1;
 }
 
-/* Description text */
 .insight-description {
-    color: #4a5568 !important;
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.6;
+    font-weight: 500;
 }
 
-/* Make sure ALL nested text is visible */
-.insight-card * {
-    color: inherit !important;
-}
-
-.warning-box-light {
-    background: #fffaf0;
-    color: #744210 !important;
-}
-
-/* Fix text inside white cards */
-.metric-card, .insight-card {
-    color: #2d3748 !important;
-}
-
-/* Ensure markdown inside cards is readable */
-.metric-card p, 
-.insight-card p, 
-.info-box-light p,
-.warning-box-light p {
-    color: inherit !important;
-}
-
-/* FIX SIDEBAR VISIBILITY */
+/* ===============================
+   SIDEBAR (DARK)
+================================= */
 section[data-testid="stSidebar"] {
-    background-color: #ffffff !important;
+    background: #0f172a !important;
 }
 
-/* Sidebar text */
 section[data-testid="stSidebar"] * {
-    color: #2d3748 !important;
+    color: #ffffff !important;
 }
 
-/* Radio + checkbox labels */
-section[data-testid="stSidebar"] label {
-    color: #2d3748 !important;
-}
-
-/* Section headings */
 section[data-testid="stSidebar"] h1,
 section[data-testid="stSidebar"] h2,
 section[data-testid="stSidebar"] h3 {
-    color: #1a202c !important;
+    color: #ffffff !important;
+    text-shadow: none;
 }
 
-/* Slider text */
-section[data-testid="stSidebar"] span {
-    color: #2d3748 !important;
+/* ===============================
+   TABS
+================================= */
+.stTabs [data-baseweb="tab-list"] {
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
+.stTabs [data-baseweb="tab"] {
+    color: #1e293b !important;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    background: #f1f5f9;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: #ffffff !important;
+}
+
+/* ===============================
+   TABLE HEADERS
+================================= */
+.dataframe th {
+    background: #f1f5f9 !important;
+    color: #1e293b !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+/* ===============================
+   INFO / WARNING BOXES
+================================= */
+.info-box-light {
+    background: #eff6ff;
+    border-left: 4px solid #3b82f6;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    color: #1e40af;
+    font-weight: 500;
+}
+
+.warning-box-light {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    color: #92400e;
+    font-weight: 500;
+}
+
+/* ===============================
+   BUTTONS
+================================= */
+.stDownloadButton > button {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s;
+}
+
+.stDownloadButton > button:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* ================================
+   FIX KPI HEADING VISIBILITY
+================================= */
+
+/* KPI label (top heading inside box) */
+div[data-testid="stMetricLabel"],
+div[data-testid="stMetricLabel"] * {
+    color: #000000 !important;   /* force black */
+}
+
+/* KPI value */
+div[data-testid="stMetricValue"],
+div[data-testid="stMetricValue"] * {
+    color: #111827 !important;
+}
+
+/* KPI delta */
+div[data-testid="stMetricDelta"],
+div[data-testid="stMetricDelta"] * {
+    color: #000000 !important;
+}
+            
+/* ================================
+   FORCE KPI TEXT RESET (FINAL FIX)
+================================= */
+
+/* Reset EVERYTHING inside KPI cards */
+div[data-testid="stMetric"],
+div[data-testid="stMetric"] * {
+    color: #000000 !important;   /* force black */
+}
+
+/* Make value slightly darker for emphasis */
+div[data-testid="stMetricValue"] {
+    color: #111827 !important;
+    font-weight: 700 !important;
+}
+
+/* Keep label slightly lighter (professional look) */
+div[data-testid="stMetricLabel"] {
+    color: #374151 !important;
+    font-weight: 600 !important;
+}
+            
+/* Tab hover + click animation */
+.stTabs [data-baseweb="tab"] {
+    transition: all 0.25s ease;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    transform: translateY(-2px);
+}
 </style>
 """, unsafe_allow_html=True)
+
 # Pollutant risk classification
 POLLUTANT_RISK = {
     'High Risk': [
@@ -148,7 +412,6 @@ POLLUTANT_RISK = {
 
 RISK_JUSTIFICATIONS = {
     'High Risk': {
-        'description': 'Substances with severe health impacts including carcinogenicity, bioaccumulation, and acute toxicity',
         'criteria': [
             'IARC Group 1 or 2A carcinogens (Benzene, Asbestos, Vinyl chloride)',
             'Heavy metals with proven neurotoxicity and organ damage (As, Cd, Cr, Pb, Hg, Ni)',
@@ -159,7 +422,6 @@ RISK_JUSTIFICATIONS = {
         'regulatory_basis': 'WHO Air Quality Guidelines (2021), IARC Monographs, Stockholm Convention, EU REACH Regulation'
     },
     'Medium Risk': {
-        'description': 'Substances causing respiratory illness, environmental damage, and chronic health conditions',
         'criteria': [
             'EPA Criteria Air Pollutants (PM10, PM2.5, NOx, SOx, CO, NMVOC)',
             'WHO-listed respiratory irritants and systemic toxins',
@@ -170,7 +432,6 @@ RISK_JUSTIFICATIONS = {
         'regulatory_basis': 'EU Air Quality Directive 2008/50/EC, WHO Global Air Quality Guidelines, EPA NAAQS'
     },
     'Climate Impact': {
-        'description': 'Greenhouse gases and ozone-depleting substances driving climate change',
         'criteria': [
             'Kyoto Protocol Annex A greenhouse gases (CO₂, CH₄, N₂O, HFCs, PFCs, SF₆)',
             'Montreal Protocol ozone-depleting substances (CFCs, HCFCs, Halons)',
@@ -180,7 +441,6 @@ RISK_JUSTIFICATIONS = {
         'regulatory_basis': 'Kyoto Protocol, Paris Agreement, Montreal Protocol, EU Emissions Trading System'
     },
     'Other': {
-        'description': 'Nutrients and general environmental indicators with localized impacts',
         'criteria': [
             'Eutrophication contributors (nitrogen, phosphorus)',
             'General water quality indicators (TOC, chlorides)',
@@ -193,7 +453,6 @@ RISK_JUSTIFICATIONS = {
 
 @st.cache_data
 def load_data():
-    """Load and preprocess emissions data"""
     try:
         df = pd.read_csv('F1_1_Air_Releases_National.csv', encoding='utf-8-sig')
         df['reportingYear'] = df['reportingYear'].astype(int)
@@ -209,17 +468,16 @@ def load_data():
         df['Risk_Category'] = df['Pollutant'].apply(classify_risk)
         return df
     except FileNotFoundError:
-        st.error(" Dataset file not found!")
+        st.error("Dataset file not found")
         st.stop()
     except Exception as e:
-        st.error(f" Error: {str(e)}")
+        st.error(f"Error loading data: {str(e)}")
         st.stop()
 
 def create_professional_header():
-    """Create professional dashboard header"""
     st.markdown("""
         <div class="dashboard-header">
-            <h1 class="dashboard-title">🌍 European Air Emissions Analytics</h1>
+            <h1 class="dashboard-title">European Air Emissions Dashboard</h1>
             <p class="dashboard-subtitle">
                 Comprehensive Analysis of Industrial Pollutant Releases | 2007-2024 | 
                 32 Countries | 68 Pollutant Types
@@ -228,10 +486,9 @@ def create_professional_header():
     """, unsafe_allow_html=True)
 
 def create_enhanced_metrics(df, filtered_df):
-    """Create professional metric cards"""
+    """Create professional metric cards in neat boxes"""
     col1, col2, col3, col4, col5 = st.columns(5)
     
-    # Calculate YoY
     years = sorted(filtered_df['reportingYear'].unique())
     if len(years) >= 2:
         current = filtered_df[filtered_df['reportingYear'] == years[-1]]['Releases'].sum()
@@ -252,7 +509,7 @@ def create_enhanced_metrics(df, filtered_df):
         st.metric(
             label="Countries Analyzed",
             value=f"{len(filtered_df['countryName'].unique())}",
-            delta=f"{len(df['countryName'].unique())} total"
+            delta=f"of {len(df['countryName'].unique())} total"
         )
     
     with col3:
@@ -266,7 +523,7 @@ def create_enhanced_metrics(df, filtered_df):
     with col4:
         year_span = filtered_df['reportingYear'].max() - filtered_df['reportingYear'].min() + 1
         st.metric(
-            label="Year Range",
+            label="Time Period",
             value=f"{year_span} years",
             delta=f"{filtered_df['reportingYear'].min()}-{filtered_df['reportingYear'].max()}"
         )
@@ -285,18 +542,15 @@ def create_enhanced_metrics(df, filtered_df):
         )
 
 def create_professional_insights(df):
-    """Create professional insight cards"""
-    # Calculate insights
+    """Create 4 neat insight boxes"""
     yearly = df.groupby('reportingYear')['Releases'].sum()
     first = yearly.iloc[0]
     last = yearly.iloc[-1]
     trend_pct = ((last - first) / first * 100)
     
-    # Top emitter
     top_country = df.groupby('countryName')['Releases'].sum().idxmax()
     top_value = df.groupby('countryName')['Releases'].sum().max() / 1e9
     
-    # Best improver
     country_trends = {}
     for country in df['countryName'].unique():
         country_data = df[df['countryName'] == country].groupby('reportingYear')['Releases'].sum()
@@ -311,24 +565,22 @@ def create_professional_insights(df):
         best_country = "N/A"
         best_improvement = 0
     
-    # High risk percentage
     if df['Releases'].sum() > 0:
         hr_pct = (df[df['Risk_Category'] == 'High Risk']['Releases'].sum() / df['Releases'].sum() * 100)
     else:
         hr_pct = 0
     
-    # Create insight cards
-    st.markdown('<div class="section-header"><h2 class="section-title">📊 Key Performance Indicators</h2></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header"><h2 class="section-title">Key Performance Indicators</h2></div>', unsafe_allow_html=True)
     
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
         card_type = "success" if trend_pct < -10 else ("danger" if trend_pct > 10 else "info")
-        icon = "📉" if trend_pct < 0 else ("📈" if trend_pct > 0 else "➡️")
+        direction = "↓" if trend_pct < 0 else ("↑" if trend_pct > 0 else "→")
         
         st.markdown(f"""
             <div class="insight-card insight-card-{card_type}">
-                <div class="insight-icon icon-{card_type}">{icon}</div>
+                <div class="insight-icon icon-{card_type}">{direction}</div>
                 <div class="insight-title">Overall Trend</div>
                 <div class="insight-value">{abs(trend_pct):.1f}%</div>
                 <div class="insight-description">
@@ -340,7 +592,7 @@ def create_professional_insights(df):
     with col2:
         st.markdown(f"""
             <div class="insight-card insight-card-warning">
-                <div class="insight-icon icon-warning">🏭</div>
+                <div class="insight-icon icon-warning">#1</div>
                 <div class="insight-title">Top Emitter</div>
                 <div class="insight-value">{top_value:.1f}B kg</div>
                 <div class="insight-description">
@@ -353,7 +605,7 @@ def create_professional_insights(df):
         if best_improvement < 0:
             st.markdown(f"""
                 <div class="insight-card insight-card-success">
-                    <div class="insight-icon icon-success">🌟</div>
+                    <div class="insight-icon icon-success">★</div>
                     <div class="insight-title">Best Performer</div>
                     <div class="insight-value">{abs(best_improvement):.1f}%</div>
                     <div class="insight-description">
@@ -364,8 +616,8 @@ def create_professional_insights(df):
         else:
             st.markdown(f"""
                 <div class="insight-card insight-card-info">
-                    <div class="insight-icon icon-info">📊</div>
-                    <div class="insight-title">Performance Leader</div>
+                    <div class="insight-icon icon-info">i</div>
+                    <div class="insight-title">Performance</div>
                     <div class="insight-value">—</div>
                     <div class="insight-description">
                         Analyzing reduction trends
@@ -375,13 +627,14 @@ def create_professional_insights(df):
     
     with col4:
         card_type = "danger" if hr_pct > 1 else "success"
+        symbol = "!" if hr_pct > 1 else "✓"
         st.markdown(f"""
             <div class="insight-card insight-card-{card_type}">
-                <div class="insight-icon icon-{card_type}">{'⚠️' if hr_pct > 1 else '✅'}</div>
+                <div class="insight-icon icon-{card_type}">{symbol}</div>
                 <div class="insight-title">High Risk Exposure</div>
                 <div class="insight-value">{hr_pct:.2f}%</div>
                 <div class="insight-description">
-                    Carcinogens & toxic substances share
+                    Toxic substances share
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -403,10 +656,10 @@ def plot_emissions_trend_advanced(df):
         y=yearly_data['Releases_MT'],
         mode='lines+markers',
         name='Actual Emissions',
-        line=dict(color='#667eea', width=3),
+        line=dict(color='#3b82f6', width=3),
         marker=dict(size=8),
         fill='tozeroy',
-        fillcolor='rgba(102, 126, 234, 0.1)'
+        fillcolor='rgba(59, 130, 246, 0.1)'
     ))
     
     fig.add_trace(go.Scatter(
@@ -414,7 +667,7 @@ def plot_emissions_trend_advanced(df):
         y=p(x),
         mode='lines',
         name='Trend Line',
-        line=dict(color='#f56565', width=2, dash='dash')
+        line=dict(color='#ef4444', width=2, dash='dash')
     ))
     
     max_year = yearly_data.loc[yearly_data['Releases_MT'].idxmax()]
@@ -424,28 +677,29 @@ def plot_emissions_trend_advanced(df):
         x=max_year['reportingYear'], y=max_year['Releases_MT'],
         text=f"Peak: {max_year['Releases_MT']:.0f}M kg",
         showarrow=True, arrowhead=2,
-        bgcolor='rgba(245, 101, 101, 0.8)', bordercolor='#f56565',
-        font=dict(color='white', size=11)
+        bgcolor='rgba(239, 68, 68, 0.9)', bordercolor='#ef4444',
+        font=dict(color='white', size=11, family='Inter')
     )
     
     fig.add_annotation(
         x=min_year['reportingYear'], y=min_year['Releases_MT'],
         text=f"Low: {min_year['Releases_MT']:.0f}M kg",
         showarrow=True, arrowhead=2,
-        bgcolor='rgba(72, 187, 120, 0.8)', bordercolor='#48bb78',
-        font=dict(color='white', size=11)
+        bgcolor='rgba(16, 185, 129, 0.9)', bordercolor='#10b981',
+        font=dict(color='white', size=11, family='Inter')
     )
     
     fig.update_layout(
         title={
-            'text': 'Total Emissions Over Time with Trend Analysis',
-            'font': {'size': 20, 'color': '#2d3748', 'family': 'Arial, sans-serif'}
+            'text': 'Historical Emissions Trend Analysis (2007-2024)',
+            'font': {'size': 18, 'color': '#1e293b', 'family': 'Inter'}
         },
         xaxis_title='Year',
         yaxis_title='Emissions (Million kg)',
         height=450,
         template='plotly_white',
         hovermode='x unified',
+        font=dict(family='Inter'),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)'
     )
@@ -485,6 +739,7 @@ def plot_interactive_map_with_labels(df, year):
     
     fig.update_layout(
         height=600,
+        font=dict(family='Inter'),
         geo=dict(
             showframe=True,
             showcoastlines=True,
@@ -497,7 +752,7 @@ def plot_interactive_map_with_labels(df, year):
     return fig
 
 def plot_risk_distribution_comprehensive(df):
-    """Risk distribution charts"""
+    """Risk distribution charts with legend"""
     risk_totals = df.groupby('Risk_Category')['Releases'].sum().reset_index()
     risk_totals['Percentage'] = (risk_totals['Releases'] / risk_totals['Releases'].sum() * 100)
     risk_totals['Releases_Billion'] = risk_totals['Releases'] / 1e9
@@ -514,10 +769,10 @@ def plot_risk_distribution_comprehensive(df):
     )
     
     color_map = {
-        'High Risk': '#f56565',
-        'Medium Risk': '#ed8936',
-        'Climate Impact': '#48bb78',
-        'Other': '#a0aec0'
+        'High Risk': '#ef4444',
+        'Medium Risk': '#f59e0b',
+        'Climate Impact': '#10b981',
+        'Other': '#94a3b8'
     }
     
     colors = [color_map.get(cat, '#cccccc') for cat in risk_totals['Risk_Category']]
@@ -528,8 +783,10 @@ def plot_risk_distribution_comprehensive(df):
             values=risk_totals['Releases_Billion'],
             hole=0.5,
             marker=dict(colors=colors, line=dict(color='white', width=2)),
-            textinfo='label+percent',
-            textfont=dict(size=12)
+            textinfo='percent',
+            textfont=dict(size=14, family='Inter', color='white'),
+            textposition='inside',
+            showlegend=True
         ),
         row=1, col=1
     )
@@ -541,15 +798,25 @@ def plot_risk_distribution_comprehensive(df):
             marker=dict(color=colors, line=dict(color='white', width=1)),
             text=risk_totals['Count'],
             textposition='outside',
-            textfont=dict(size=14, color='#2d3748')
+            textfont=dict(size=16, color='#1e293b', family='Inter', weight='bold'),
+            showlegend=False
         ),
         row=1, col=2
     )
     
     fig.update_layout(
-        height=400,
-        showlegend=False,
+        height=450,
+        showlegend=True,
+        legend=dict(
+            orientation="v",
+            yanchor="middle",
+            y=0.5,
+            xanchor="left",
+            x=1.15,
+            font=dict(size=12, family='Inter')
+        ),
         template='plotly_white',
+        font=dict(family='Inter'),
         paper_bgcolor='rgba(0,0,0,0)'
     )
     
@@ -560,7 +827,7 @@ def plot_risk_distribution_comprehensive(df):
 
 def create_risk_classification_details():
     """Risk classification details"""
-    st.markdown('<div class="section-header"><h2 class="section-title">📋 Scientific Risk Classification Methodology</h2></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-header"><h2 class="section-title">Scientific Risk Classification Methodology</h2></div>', unsafe_allow_html=True)
     
     st.markdown("""
         <div class="info-box-light">
@@ -570,18 +837,17 @@ def create_risk_classification_details():
     """, unsafe_allow_html=True)
     
     tab1, tab2, tab3, tab4 = st.tabs([
-        "🔴 High Risk (27 pollutants)",
-        "🟠 Medium Risk (27 pollutants)",
-        "🟢 Climate Impact (10 pollutants)",
-        "⚪ Other (4 pollutants)"
+        "High Risk (27 pollutants)",
+        "Medium Risk (27 pollutants)",
+        "Climate Impact (10 pollutants)",
+        "Other (4 pollutants)"
     ])
     
     with tab1:
         info = RISK_JUSTIFICATIONS['High Risk']
-        st.markdown(f"**Definition:** {info['description']}")
         st.markdown("**Classification Criteria:**")
         for criterion in info['criteria']:
-            st.markdown(f"- {criterion}")
+            st.markdown(f"• {criterion}")
         st.markdown(f"""
             <div class="warning-box-light">
                 <strong>Health Effects:</strong> {info['health_effects']}
@@ -589,7 +855,7 @@ def create_risk_classification_details():
         """, unsafe_allow_html=True)
         st.markdown(f"**Regulatory Basis:** {info['regulatory_basis']}")
         
-        with st.expander("📋 View all 27 High Risk pollutants"):
+        with st.expander("View all 27 High Risk pollutants"):
             cols = st.columns(2)
             pollutants = POLLUTANT_RISK['High Risk']
             mid = len(pollutants) // 2
@@ -602,10 +868,9 @@ def create_risk_classification_details():
     
     with tab2:
         info = RISK_JUSTIFICATIONS['Medium Risk']
-        st.markdown(f"**Definition:** {info['description']}")
         st.markdown("**Classification Criteria:**")
         for criterion in info['criteria']:
-            st.markdown(f"- {criterion}")
+            st.markdown(f"• {criterion}")
         st.markdown(f"""
             <div class="info-box-light">
                 <strong>Health Effects:</strong> {info['health_effects']}
@@ -613,7 +878,7 @@ def create_risk_classification_details():
         """, unsafe_allow_html=True)
         st.markdown(f"**Regulatory Basis:** {info['regulatory_basis']}")
         
-        with st.expander("📋 View all 27 Medium Risk pollutants"):
+        with st.expander("View all 27 Medium Risk pollutants"):
             cols = st.columns(2)
             pollutants = POLLUTANT_RISK['Medium Risk']
             mid = len(pollutants) // 2
@@ -626,10 +891,9 @@ def create_risk_classification_details():
     
     with tab3:
         info = RISK_JUSTIFICATIONS['Climate Impact']
-        st.markdown(f"**Definition:** {info['description']}")
         st.markdown("**Classification Criteria:**")
         for criterion in info['criteria']:
-            st.markdown(f"- {criterion}")
+            st.markdown(f"• {criterion}")
         st.markdown(f"""
             <div class="info-box-light">
                 <strong>Environmental Effects:</strong> {info['health_effects']}
@@ -637,16 +901,15 @@ def create_risk_classification_details():
         """, unsafe_allow_html=True)
         st.markdown(f"**Regulatory Basis:** {info['regulatory_basis']}")
         
-        with st.expander("📋 View all 10 Climate Impact pollutants"):
+        with st.expander("View all 10 Climate Impact pollutants"):
             for p in POLLUTANT_RISK['Climate Impact']:
                 st.markdown(f"• {p}")
     
     with tab4:
         info = RISK_JUSTIFICATIONS['Other']
-        st.markdown(f"**Definition:** {info['description']}")
         st.markdown("**Classification Criteria:**")
         for criterion in info['criteria']:
-            st.markdown(f"- {criterion}")
+            st.markdown(f"• {criterion}")
         st.markdown(f"""
             <div class="info-box-light">
                 <strong>Environmental Effects:</strong> {info['health_effects']}
@@ -654,7 +917,7 @@ def create_risk_classification_details():
         """, unsafe_allow_html=True)
         st.markdown(f"**Regulatory Basis:** {info['regulatory_basis']}")
         
-        with st.expander("📋 View all 4 Other pollutants"):
+        with st.expander("View all 4 Other pollutants"):
             for p in POLLUTANT_RISK['Other']:
                 st.markdown(f"• {p}")
 
@@ -671,16 +934,17 @@ def plot_risk_area_chart(df):
         title='Emissions by Risk Category Over Time',
         labels={'reportingYear': 'Year', 'Releases_MT': 'Emissions (Million kg)'},
         color_discrete_map={
-            'High Risk': '#f56565',
-            'Medium Risk': '#ed8936',
-            'Climate Impact': '#48bb78',
-            'Other': '#a0aec0'
+            'High Risk': '#ef4444',
+            'Medium Risk': '#f59e0b',
+            'Climate Impact': '#10b981',
+            'Other': '#94a3b8'
         }
     )
     
     fig.update_layout(
         height=450,
         template='plotly_white',
+        font=dict(family='Inter'),
         hovermode='x unified',
         paper_bgcolor='rgba(0,0,0,0)'
     )
@@ -711,13 +975,14 @@ def plot_top_polluters_race(df, pollutant, top_n=10):
         title=f'Top {top_n} Countries - {pollutant} (Animated)',
         labels={'Releases_MT': 'Emissions (Million kg)', 'countryName': 'Country'},
         color='Releases_MT',
-        color_continuous_scale=[[0, '#667eea'], [1, '#f56565']],
+        color_continuous_scale=[[0, '#3b82f6'], [1, '#ef4444']],
         range_x=[0, yearly['Releases_MT'].max() * 1.1]
     )
     
     fig.update_layout(
         height=500,
         template='plotly_white',
+        font=dict(family='Inter'),
         showlegend=False,
         paper_bgcolor='rgba(0,0,0,0)'
     )
@@ -750,6 +1015,7 @@ def plot_correlation_matrix(df, selected_countries):
     fig.update_layout(
         height=500,
         template='plotly_white',
+        font=dict(family='Inter'),
         paper_bgcolor='rgba(0,0,0,0)'
     )
     
@@ -757,22 +1023,17 @@ def plot_correlation_matrix(df, selected_countries):
 
 # Main Application
 def main():
-    # Professional header
     create_professional_header()
     
-    # Load data
     with st.spinner('Loading emissions data...'):
         df = load_data()
-    
-   
-    
-    # Sidebar with professional styling
+        
+    # Sidebar with visible dropdowns
     with st.sidebar:
-        st.markdown("##  Analysis Controls")
+        st.markdown("## Analysis Controls")
         st.markdown("---")
         
-        # Year filter
-        st.markdown("###  Time Period")
+        st.markdown("### Time Period")
         year_preset = st.radio(
             "Quick selection:",
             ["Custom Range", "Last 5 Years", "Last 10 Years", "All Years"],
@@ -793,42 +1054,65 @@ def main():
         
         st.markdown("---")
         
-        # Country filter
-        st.markdown("### 🌍 Geographic Scope")
+        st.markdown("### Geographic Scope")
         all_countries = sorted(df['countryName'].unique())
         
-        if st.checkbox("Select all countries", value=True):
+        country_option = st.radio(
+            "Country selection:",
+            ["All Countries", "Select Specific Countries"],
+            label_visibility="collapsed"
+        )
+        
+        if country_option == "All Countries":
             selected_countries = all_countries
+            st.info(f"All {len(all_countries)} countries selected")
         else:
             selected_countries = st.multiselect(
                 "Choose countries:",
                 options=all_countries,
-                default=all_countries[:8]
+                default=all_countries[:5]
             )
         
         st.markdown("---")
         
-        # Risk filter
-        st.markdown("### ⚠️ Risk Categories")
-        risk_categories = st.multiselect(
-            "Filter by risk level:",
-            options=['High Risk', 'Medium Risk', 'Climate Impact', 'Other'],
-            default=['High Risk', 'Medium Risk', 'Climate Impact', 'Other']
+        st.markdown("### Risk Categories")
+        risk_option = st.radio(
+            "Risk category selection:",
+            ["All Risk Categories", "Select Specific Categories"],
+            label_visibility="collapsed"
         )
         
-        # Pollutant filter
+        if risk_option == "All Risk Categories":
+            risk_categories = ['High Risk', 'Medium Risk', 'Climate Impact', 'Other']
+            st.info("All 4 risk categories selected")
+        else:
+            risk_categories = st.multiselect(
+                "Choose risk categories:",
+                options=['High Risk', 'Medium Risk', 'Climate Impact', 'Other'],
+                default=['High Risk', 'Medium Risk']
+            )
+        
         available_pollutants = df[df['Risk_Category'].isin(risk_categories)]['Pollutant'].unique()
         
-        st.markdown(f"### 🧪 Pollutant Selection")
+        st.markdown("---")
+        
+        st.markdown(f"### Pollutant Selection")
         st.caption(f"{len(available_pollutants)} pollutants available")
         
-        if st.checkbox("Select all pollutants", value=True):
+        pollutant_option = st.radio(
+            "Pollutant selection:",
+            ["All Pollutants", "Select Specific Pollutants"],
+            label_visibility="collapsed"
+        )
+        
+        if pollutant_option == "All Pollutants":
             selected_pollutants = list(available_pollutants)
+            st.info(f"All {len(available_pollutants)} pollutants selected")
         else:
             selected_pollutants = st.multiselect(
-                "Choose specific pollutants:",
+                "Choose pollutants:",
                 options=sorted(available_pollutants),
-                default=sorted(available_pollutants)[:10]
+                default=sorted(available_pollutants)[:5]
             )
     
     # Apply filters
@@ -841,14 +1125,14 @@ def main():
     ]
     
     if len(filtered_df) == 0:
-        st.error("⚠️ No data matches your current filter selection. Please adjust the filters.")
+        st.error("No data matches your current filter selection. Please adjust the filters.")
         return
     
-    # Professional metrics
-    st.markdown('<div class="section-header"><h2 class="section-title">📈 Executive Summary</h2></div>', unsafe_allow_html=True)
+    # Executive Summary with neat metric boxes
+    st.markdown('<div class="section-header"><h2 class="section-title">Executive Summary</h2></div>', unsafe_allow_html=True)
     create_enhanced_metrics(df, filtered_df)
     
-    # Professional insights
+    # Key Performance Indicators - 4 neat boxes
     st.markdown("<br>", unsafe_allow_html=True)
     create_professional_insights(filtered_df)
     
@@ -856,24 +1140,16 @@ def main():
     st.markdown("<br>", unsafe_allow_html=True)
     
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📈 Temporal Trends",
-        "🗺️ Geographic Analysis",
-        "⚠️ Risk Assessment",
-        "🏆 Country Rankings",
-        "🔬 Pollutant Analysis",
-        "📊 Advanced Analytics"
+        "Temporal Trends",
+        "Geographic Analysis",
+        "Risk Assessment",
+        "Country Rankings",
+        "Pollutant Analysis",
+        "Advanced Analytics"
     ])
     
     with tab1:
-        st.markdown('<div class="section-header"><h3 class="section-title">Emission Trends Over Time</h3></div>', unsafe_allow_html=True)
-        
-        st.markdown("""
-            <div class="info-box-light">
-                💡 <strong>Interpretation Guide:</strong> The blue area shows actual emission volumes, 
-                while the red dashed line indicates the overall trend using polynomial regression. 
-                Peaks and valleys are automatically annotated.
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><h3 class="section-title">Total Emissions Trend (2007-2024)</h3></div>', unsafe_allow_html=True)
         
         fig = plot_emissions_trend_advanced(filtered_df)
         st.plotly_chart(fig, use_container_width=True)
@@ -885,7 +1161,7 @@ def main():
         yearly['YoY_%'] = yearly['Releases'].pct_change() * 100
         
         fig_yoy = go.Figure()
-        colors = ['#48bb78' if x < 0 else '#f56565' for x in yearly['YoY_%']]
+        colors = ['#10b981' if x < 0 else '#ef4444' for x in yearly['YoY_%']]
         
         fig_yoy.add_trace(go.Bar(
             x=yearly['reportingYear'],
@@ -894,7 +1170,7 @@ def main():
             marker_line=dict(color='white', width=1),
             text=yearly['YoY_%'].round(1).astype(str) + '%',
             textposition='outside',
-            textfont=dict(size=11)
+            textfont=dict(size=11, family='Inter')
         ))
         
         fig_yoy.update_layout(
@@ -903,6 +1179,7 @@ def main():
             yaxis_title='Change (%)',
             height=400,
             template='plotly_white',
+            font=dict(family='Inter'),
             paper_bgcolor='rgba(0,0,0,0)'
         )
         
@@ -910,13 +1187,6 @@ def main():
     
     with tab2:
         st.markdown('<div class="section-header"><h3 class="section-title">Geographic Distribution</h3></div>', unsafe_allow_html=True)
-        
-        st.markdown("""
-            <div class="info-box-light">
-                💡 <strong>Interactive Features:</strong> Hover over countries to see exact emission values. 
-                Darker red indicates higher pollution levels. Use the year slider to analyze temporal changes.
-            </div>
-        """, unsafe_allow_html=True)
         
         map_year = st.slider(
             "Select year for geographic visualization:",
@@ -943,12 +1213,13 @@ def main():
             title='Total Emissions by Country (Ranked)',
             labels={'Billion': 'Total Emissions (Billion kg)', 'countryName': ''},
             color='Billion',
-            color_continuous_scale=[[0, '#667eea'], [1, '#f56565']]
+            color_continuous_scale=[[0, '#3b82f6'], [1, '#ef4444']]
         )
         
         fig_countries.update_layout(
             height=max(400, len(country_totals) * 25),
             template='plotly_white',
+            font=dict(family='Inter'),
             showlegend=False,
             paper_bgcolor='rgba(0,0,0,0)'
         )
@@ -963,9 +1234,9 @@ def main():
         
         st.markdown("""
             <div class="warning-box-light">
-                📊 <strong>Dual Perspective:</strong> The left chart shows emission volume distribution 
-                (what percentage of total emissions comes from each risk category), while the right chart 
-                displays the number of different pollutants in each category.
+                <strong>Chart Explanation:</strong> The donut chart (left) shows what percentage of total emissions 
+                comes from each risk category. The bar chart (right) shows how many different pollutant types fall 
+                into each category.
             </div>
         """, unsafe_allow_html=True)
         
@@ -978,9 +1249,8 @@ def main():
         fig_area = plot_risk_area_chart(filtered_df)
         st.plotly_chart(fig_area, use_container_width=True)
         
-        # Stats table
         st.markdown("---")
-        st.markdown('<div class="section-header"><h3 class="section-title">📋 Detailed Risk Statistics</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><h3 class="section-title">Detailed Risk Statistics</h3></div>', unsafe_allow_html=True)
         
         risk_stats = filtered_df.groupby('Risk_Category').agg({
             'Releases': 'sum',
@@ -1026,21 +1296,15 @@ def main():
         
         csv = scorecard_df.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label=" Download Scorecard (CSV)",
+            label="Download Scorecard (CSV)",
             data=csv,
             file_name="country_scorecard.csv",
             mime="text/csv"
         )
         
         st.markdown("---")
-        st.markdown('<div class="section-header"><h3 class="section-title">🎬 Dynamic Country Rankings</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><h3 class="section-title">Dynamic Country Rankings</h3></div>', unsafe_allow_html=True)
         
-        st.markdown("""
-            <div class="info-box-light">
-                💡 <strong>Animation Controls:</strong> Click play to watch how country rankings evolve over time. 
-                Use pause and the slider for detailed year-by-year exploration.
-            </div>
-        """, unsafe_allow_html=True)
         
         anim_pollutant = st.selectbox(
             "Select pollutant for animated ranking:",
@@ -1091,8 +1355,8 @@ def main():
                 markers=True
             )
             
-            fig_p.update_traces(line=dict(color='#667eea', width=3), marker=dict(size=8))
-            fig_p.update_layout(height=400, template='plotly_white', paper_bgcolor='rgba(0,0,0,0)')
+            fig_p.update_traces(line=dict(color='#3b82f6', width=3), marker=dict(size=8))
+            fig_p.update_layout(height=400, template='plotly_white', font=dict(family='Inter'), paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_p, use_container_width=True)
             
             st.markdown("---")
@@ -1109,12 +1373,13 @@ def main():
                 orientation='h',
                 labels={'MT': 'Emissions (Million kg)', 'countryName': ''},
                 color='MT',
-                color_continuous_scale=[[0, '#667eea'], [1, '#f56565']]
+                color_continuous_scale=[[0, '#3b82f6'], [1, '#ef4444']]
             )
             
             fig_cp.update_layout(
                 height=400,
                 template='plotly_white',
+                font=dict(family='Inter'),
                 showlegend=False,
                 paper_bgcolor='rgba(0,0,0,0)'
             )
@@ -1122,13 +1387,13 @@ def main():
             st.plotly_chart(fig_cp, use_container_width=True)
     
     with tab6:
-        st.markdown('<div class="section-header"><h3 class="section-title">🔗 Cross-Country Correlation Analysis</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><h3 class="section-title">Cross-Country Correlation Analysis</h3></div>', unsafe_allow_html=True)
         
         st.markdown("""
             <div class="info-box-light">
-                💡 <strong>Correlation Interpretation:</strong> Values close to +1 (red) indicate countries 
-                with highly synchronized emission patterns, suggesting similar industrial structures or policy coordination. 
-                Values close to -1 (blue) indicate opposite trends.
+                <strong></strong> This correlation matrix shows how similarly countries' 
+                emissions change over time. Values close to +1 (red) mean similar patterns. Values close to 
+                -1 (blue) mean opposite patterns. Values near 0 (white) mean no relationship.
             </div>
         """, unsafe_allow_html=True)
         
@@ -1137,21 +1402,20 @@ def main():
             if fig_corr:
                 st.plotly_chart(fig_corr, use_container_width=True)
         else:
-            st.warning("⚠️ Please select at least 2 countries to view correlation analysis")
+            st.warning("Please select at least 2 countries to view correlation analysis")
         
         st.markdown("---")
-        st.markdown('<div class="section-header"><h3 class="section-title">📥 Data Export Center</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><h3 class="section-title">Data Export Center</h3></div>', unsafe_allow_html=True)
         
         col1, col2, col3 = st.columns(3)
         
         with col1:
             csv_full = filtered_df.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label="📄 Full Dataset",
+                label="Full Dataset",
                 data=csv_full,
                 file_name="filtered_emissions.csv",
-                mime="text/csv",
-                help="Download complete filtered dataset"
+                mime="text/csv"
             )
         
         with col2:
@@ -1161,11 +1425,10 @@ def main():
             }).reset_index()
             csv_summary = summary.to_csv(index=False).encode('utf-8')
             st.download_button(
-                label=" Summary Report",
+                label="Summary Report",
                 data=csv_summary,
                 file_name="summary_report.csv",
-                mime="text/csv",
-                help="Aggregated summary by country, year, and risk"
+                mime="text/csv"
             )
         
         with col3:
@@ -1178,18 +1441,17 @@ def main():
             )
             csv_pivot = pivot.to_csv().encode('utf-8')
             st.download_button(
-                label=" Pivot Table",
+                label="Pivot Table",
                 data=csv_pivot,
                 file_name="emissions_pivot.csv",
-                mime="text/csv",
-                help="Pivot table: countries × years"
+                mime="text/csv"
             )
         
         st.markdown("---")
-        st.markdown('<div class="section-header"><h3 class="section-title">🔍 Raw Data Explorer</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-header"><h3 class="section-title">Raw Data Explorer</h3></div>', unsafe_allow_html=True)
         
         if st.checkbox("Display detailed data table"):
-            search = st.text_input("🔎 Search by country or pollutant name:")
+            search = st.text_input("Search by country or pollutant name:")
             
             display = filtered_df.copy()
             if search:

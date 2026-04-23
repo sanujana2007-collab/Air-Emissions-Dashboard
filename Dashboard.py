@@ -369,6 +369,7 @@ div[data-testid="stMetricLabel"] {
 """, unsafe_allow_html=True)
 
 # Pollutant risk classification
+# Manually curated from WHO, EPA, IARC and EU treaty standards.
 POLLUTANT_RISK = {
     'High Risk': [
         'Arsenic and compounds (as As)', 'Cadmium and compounds (as Cd)', 
@@ -410,6 +411,7 @@ POLLUTANT_RISK = {
     ]
 }
 
+# Metadata for the risk methodology tab — criteria, health effects, regulatory basis per category
 RISK_JUSTIFICATIONS = {
     'High Risk': {
         'criteria': [
@@ -453,6 +455,7 @@ RISK_JUSTIFICATIONS = {
 
 @st.cache_data
 def load_data():
+   # Reads CSV, coerces numeric columns, drops bad rows, then tags each pollutant with its risk category
     try:
         df = pd.read_csv('F1_1_Air_Releases_National.csv', encoding='utf-8-sig')
         df['reportingYear'] = df['reportingYear'].astype(int)
@@ -488,7 +491,7 @@ def create_professional_header():
 def create_enhanced_metrics(df, filtered_df):
     """Create professional metric cards in neat boxes"""
     col1, col2, col3, col4, col5 = st.columns(5)
-    
+    # Year-over-year delta shown on the total emissions card
     years = sorted(filtered_df['reportingYear'].unique())
     if len(years) >= 2:
         current = filtered_df[filtered_df['reportingYear'] == years[-1]]['Releases'].sum()
@@ -543,14 +546,17 @@ def create_enhanced_metrics(df, filtered_df):
 
 def create_professional_insights(df):
     """Create 4 neat insight boxes"""
+      # Overall trend
     yearly = df.groupby('reportingYear')['Releases'].sum()
     first = yearly.iloc[0]
     last = yearly.iloc[-1]
     trend_pct = ((last - first) / first * 100)
     
+     # Top emitter by cumulative volume across the selected period
     top_country = df.groupby('countryName')['Releases'].sum().idxmax()
     top_value = df.groupby('countryName')['Releases'].sum().max() / 1e9
     
+     # Best performer = country with largest percentage reduction
     country_trends = {}
     for country in df['countryName'].unique():
         country_data = df[df['countryName'] == country].groupby('reportingYear')['Releases'].sum()
@@ -565,6 +571,7 @@ def create_professional_insights(df):
         best_country = "N/A"
         best_improvement = 0
     
+    # High-risk share of total volume
     if df['Releases'].sum() > 0:
         hr_pct = (df[df['Risk_Category'] == 'High Risk']['Releases'].sum() / df['Releases'].sum() * 100)
     else:
@@ -711,6 +718,7 @@ def plot_interactive_map_with_labels(df, year):
     year_data = df[df['reportingYear'] == year].groupby('countryName')['Releases'].sum().reset_index()
     year_data['Releases_Billion'] = year_data['Releases'] / 1e9
     
+    # Plotly's choropleth is mapped by ISO-3 country codes
     country_iso = {
         'Germany': 'DEU', 'France': 'FRA', 'Italy': 'ITA', 'Spain': 'ESP', 'Poland': 'POL',
         'United Kingdom': 'GBR', 'Netherlands': 'NLD', 'Belgium': 'BEL', 'Austria': 'AUT',
@@ -757,6 +765,7 @@ def plot_risk_distribution_comprehensive(df):
     risk_totals['Percentage'] = (risk_totals['Releases'] / risk_totals['Releases'].sum() * 100)
     risk_totals['Releases_Billion'] = risk_totals['Releases'] / 1e9
     
+#aggregation for pollutant count
     pollutant_counts = df.groupby('Risk_Category')['Pollutant'].nunique().reset_index()
     pollutant_counts.columns = ['Risk_Category', 'Count']
     
@@ -1095,7 +1104,7 @@ def main():
         available_pollutants = df[df['Risk_Category'].isin(risk_categories)]['Pollutant'].unique()
         
         st.markdown("---")
-        
+ # Pollutant list updates based on the risk categories chosen above
         st.markdown(f"### Pollutant Selection")
         st.caption(f"{len(available_pollutants)} pollutants available")
         
@@ -1128,7 +1137,7 @@ def main():
         st.error("No data matches your current filter selection. Please adjust the filters.")
         return
     
-    # Executive Summary with neat metric boxes
+    # Executive Summary with metric boxes
     st.markdown('<div class="section-header"><h2 class="section-title">Executive Summary</h2></div>', unsafe_allow_html=True)
     create_enhanced_metrics(df, filtered_df)
     

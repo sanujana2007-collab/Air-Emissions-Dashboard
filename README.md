@@ -8,7 +8,7 @@ This dashboard enables users to explore emission trends, identify high-risk poll
 
 | | |
 |---|---|
-| **Streamlit App** | *(add your deployed app URL here)* |
+| **Streamlit App** | https://air-emissions-dashboard-adwkvy4kwmo4yj79lvrmjz.streamlit.app/ |
 
 
 ---

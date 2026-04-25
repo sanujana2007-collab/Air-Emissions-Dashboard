@@ -370,7 +370,7 @@ div[data-testid="stMetricLabel"] {
 """, unsafe_allow_html=True)
 
 # Pollutant risk classification
-# Manually curated from WHO, EPA, IARC and EU treaty standards.
+#curated from WHO, EPA, IARC and EU treaty standards.
 POLLUTANT_RISK = {
     'High Risk': [
         'Arsenic and compounds (as As)', 'Cadmium and compounds (as Cd)', 

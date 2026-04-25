@@ -1045,7 +1045,7 @@ def main():
     with st.spinner('Loading emissions data...'):
         df = load_data()
         
-    # Sidebar with visible dropdowns
+ # Sidebar with visible dropdowns
     with st.sidebar:
         st.markdown("## Analysis Controls")
         st.markdown("---")
@@ -1073,7 +1073,7 @@ def main():
         
         st.markdown("### Geographic Scope")
         all_countries = sorted(df['countryName'].unique())
-        
+
         
         country_option = st.radio(
             "Country selection:",

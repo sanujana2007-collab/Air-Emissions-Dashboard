@@ -647,6 +647,7 @@ def create_professional_insights(df):
             </div>
         """, unsafe_allow_html=True)
 
+#time-series emission trend with polynomial regression overlay
 def plot_emissions_trend_advanced(df):
     """Create time series with trend"""
     yearly_data = df.groupby('reportingYear')['Releases'].sum().reset_index()
@@ -668,7 +669,7 @@ def plot_emissions_trend_advanced(df):
         marker=dict(size=8),
         fill='tozeroy',
         fillcolor='rgba(59, 130, 246, 0.1)'
-    ))
+    )) 
     
     fig.add_trace(go.Scatter(
         x=yearly_data['reportingYear'],

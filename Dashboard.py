@@ -718,7 +718,13 @@ def plot_interactive_map_with_labels(df, year):
     """Create choropleth map"""
     year_data = df[df['reportingYear'] == year].groupby('countryName')['Releases'].sum().reset_index()
     year_data['Releases_Billion'] = year_data['Releases'] / 1e9
-    
+    all_years_max = (
+        df.groupby(['reportingYear', 'countryName'])['Releases']
+        .sum()
+        .max() / 1e9
+    )
+    scale_max = max(round(all_years_max + 0.5), 1)  # round up, minimum 1
+
     # Plotly's choropleth is mapped by ISO-3 country codes
     country_iso = {
         'Germany': 'DEU', 'France': 'FRA', 'Italy': 'ITA', 'Spain': 'ESP', 'Poland': 'POL',
@@ -729,9 +735,9 @@ def plot_interactive_map_with_labels(df, year):
         'Lithuania': 'LTU', 'Latvia': 'LVA', 'Estonia': 'EST', 'Luxembourg': 'LUX',
         'Cyprus': 'CYP', 'Malta': 'MLT', 'Iceland': 'ISL', 'Switzerland': 'CHE', 'Serbia': 'SRB'
     }
-    
+
     year_data['ISO'] = year_data['countryName'].map(country_iso)
-    
+
     fig = px.choropleth(
         year_data,
         locations='ISO',
@@ -739,6 +745,7 @@ def plot_interactive_map_with_labels(df, year):
         hover_name='countryName',
         hover_data={'Releases_Billion': ':.2f', 'ISO': False},
         color_continuous_scale='Reds',
+        range_color=[0, scale_max],  
         scope='europe',
         title=f'Geographic Distribution of Emissions - {year}',
         labels={'Releases_Billion': 'Emissions (Billion kg)'}

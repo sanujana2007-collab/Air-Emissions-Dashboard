@@ -557,7 +557,7 @@ def create_professional_insights(df):
     top_country = df.groupby('countryName')['Releases'].sum().idxmax()
     top_value = df.groupby('countryName')['Releases'].sum().max() / 1e9
     
-     # Best performer = country with largest percentage reduction
+# Best performer = country with the largest percenatge reduction
     country_trends = {}
     for country in df['countryName'].unique():
         country_data = df[df['countryName'] == country].groupby('reportingYear')['Releases'].sum()

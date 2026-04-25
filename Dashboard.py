@@ -969,6 +969,7 @@ def plot_risk_area_chart(df):
     
     return fig
 
+#animated bar chart for country ranking
 def plot_top_polluters_race(df, pollutant, top_n=10):
     """Animated bar chart"""
     pollutant_data = df[df['Pollutant'] == pollutant]

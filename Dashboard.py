@@ -1133,7 +1133,7 @@ def main():
                 default=sorted(available_pollutants)[:5]
             )
     
-    # Apply filters
+# Apply filters
     filtered_df = df[
         (df['reportingYear'] >= year_range[0]) &
         (df['reportingYear'] <= year_range[1]) &

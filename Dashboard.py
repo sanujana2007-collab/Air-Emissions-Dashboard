@@ -456,7 +456,7 @@ RISK_JUSTIFICATIONS = {
 
 @st.cache_data
 def load_data():
-   # Reads CSV, coerces numeric columns, drops bad rows, then tags each pollutant with its risk category
+# Reads CSV, coerces numeric columns, drops bad rows, then tags each pollutant with its risk category
     try:
         df = pd.read_csv('F1_1_Air_Releases_National.csv', encoding='utf-8-sig')
         df['reportingYear'] = df['reportingYear'].astype(int)

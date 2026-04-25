@@ -1038,7 +1038,7 @@ def plot_correlation_matrix(df, selected_countries):
     
     return fig
 
-# Main Application
+ #Main Application
 def main():
     create_professional_header()
     
@@ -1073,6 +1073,7 @@ def main():
         
         st.markdown("### Geographic Scope")
         all_countries = sorted(df['countryName'].unique())
+        
         
         country_option = st.radio(
             "Country selection:",

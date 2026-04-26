@@ -805,7 +805,7 @@ def plot_risk_distribution_comprehensive(df):
     textfont=dict(size=12, family='Inter', color='white'),
     textposition='inside',
     showlegend=True,
-    hovertemplate='<b>%{label}</b><br>Pollutant types: %{value}<br>Share: %{percent}<extra></extra>'
+    hovertemplate='<b>%{label}</b><br>Pollutant types: %{value}<br>Share: %{percent}<extra></extra>')
 ),
     
     fig.add_trace(
@@ -817,7 +817,7 @@ def plot_risk_distribution_comprehensive(df):
     textposition='outside',
     textfont=dict(size=11, color='#1e293b', family='Inter'),
     showlegend=False,
-    hovertemplate='<b>%{x}</b><br>Volume: %{y:.4f} Billion kg<extra></extra>'
+    hovertemplate='<b>%{x}</b><br>Volume: %{y:.4f} Billion kg<extra></extra>')
 ),
     
     fig.update_layout(

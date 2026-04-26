@@ -782,7 +782,7 @@ def plot_risk_distribution_comprehensive(df):
     
     fig = make_subplots(
         rows=1, cols=2,
-        subplot_titles=('Emission Volume Distribution', 'Pollutant Count by Category'),
+        subplot_titles=('Pollutant Count by Risk Category', 'Emission Volume by Risk Category (log scale)'),
         specs=[[{'type': 'pie'}, {'type': 'bar'}]]
     )
     
@@ -796,31 +796,29 @@ def plot_risk_distribution_comprehensive(df):
     colors = [color_map.get(cat, '#cccccc') for cat in risk_totals['Risk_Category']]
     
     fig.add_trace(
-        go.Pie(
-            labels=risk_totals['Risk_Category'],
-            values=risk_totals['Releases_Billion'],
-            hole=0.5,
-            marker=dict(colors=colors, line=dict(color='white', width=2)),
-            textinfo='percent',
-            textfont=dict(size=14, family='Inter', color='white'),
-            textposition='inside',
-            showlegend=True
-        ),
-        row=1, col=1
-    )
+       go.Pie(
+    labels=risk_totals['Risk_Category'],
+    values=risk_totals['Count'],          # COUNT not Releases_Billion
+    hole=0.5,
+    marker=dict(colors=colors, line=dict(color='white', width=2)),
+    textinfo='label+percent',
+    textfont=dict(size=12, family='Inter', color='white'),
+    textposition='inside',
+    showlegend=True,
+    hovertemplate='<b>%{label}</b><br>Pollutant types: %{value}<br>Share: %{percent}<extra></extra>'
+),
     
     fig.add_trace(
         go.Bar(
-            x=risk_totals['Risk_Category'],
-            y=risk_totals['Count'],
-            marker=dict(color=colors, line=dict(color='white', width=1)),
-            text=risk_totals['Count'],
-            textposition='outside',
-            textfont=dict(size=16, color='#1e293b', family='Inter', weight='bold'),
-            showlegend=False
-        ),
-        row=1, col=2
-    )
+    x=risk_totals['Risk_Category'],
+    y=risk_totals['Releases_Billion'],
+    marker=dict(color=colors, line=dict(color='white', width=1)),
+    text=[f"{v:.2f}B kg" for v in risk_totals['Releases_Billion']],
+    textposition='outside',
+    textfont=dict(size=11, color='#1e293b', family='Inter'),
+    showlegend=False,
+    hovertemplate='<b>%{x}</b><br>Volume: %{y:.4f} Billion kg<extra></extra>'
+),
     
     fig.update_layout(
         height=450,
@@ -839,7 +837,11 @@ def plot_risk_distribution_comprehensive(df):
     )
     
     fig.update_xaxes(title_text='Risk Category', row=1, col=2)
-    fig.update_yaxes(title_text='Number of Pollutants', row=1, col=2)
+    fig.update_yaxes(
+    title_text='Total Releases (Billion kg, log scale)',
+    type='log',
+    row=1, col=2
+)
     
     return fig
 

@@ -769,57 +769,57 @@ def plot_interactive_map_with_labels(df, year):
     return fig
 
 def plot_risk_distribution_comprehensive(df):
-    """Risk distribution charts with legend"""
     risk_totals = df.groupby('Risk_Category')['Releases'].sum().reset_index()
     risk_totals['Percentage'] = (risk_totals['Releases'] / risk_totals['Releases'].sum() * 100)
     risk_totals['Releases_Billion'] = risk_totals['Releases'] / 1e9
-    
-#aggregation for pollutant count
+
     pollutant_counts = df.groupby('Risk_Category')['Pollutant'].nunique().reset_index()
     pollutant_counts.columns = ['Risk_Category', 'Count']
-    
+
     risk_totals = risk_totals.merge(pollutant_counts, on='Risk_Category')
-    
+
     fig = make_subplots(
         rows=1, cols=2,
-        subplot_titles=('Pollutant Count by Risk Category', 'Emission Volume by Risk Category (log scale)'),
+        subplot_titles=('Emission Volume Distribution', 'Pollutant Count by Category'),
         specs=[[{'type': 'pie'}, {'type': 'bar'}]]
     )
-    
+
     color_map = {
         'High Risk': '#ef4444',
         'Medium Risk': '#f59e0b',
         'Climate Impact': '#10b981',
         'Other': '#94a3b8'
     }
-    
+
     colors = [color_map.get(cat, '#cccccc') for cat in risk_totals['Risk_Category']]
-    
+
     fig.add_trace(
-       go.Pie(
-    labels=risk_totals['Risk_Category'],
-    values=risk_totals['Count'],          # COUNT not Releases_Billion
-    hole=0.5,
-    marker=dict(colors=colors, line=dict(color='white', width=2)),
-    textinfo='label+percent',
-    textfont=dict(size=12, family='Inter', color='white'),
-    textposition='inside',
-    showlegend=True,
-    hovertemplate='<b>%{label}</b><br>Pollutant types: %{value}<br>Share: %{percent}<extra></extra>')
-),
-    
+        go.Pie(
+            labels=risk_totals['Risk_Category'],
+            values=risk_totals['Count'],          # FIXED: was Releases_Billion
+            hole=0.5,
+            marker=dict(colors=colors, line=dict(color='white', width=2)),
+            textinfo='percent',
+            textfont=dict(size=14, family='Inter', color='white'),
+            textposition='inside',
+            showlegend=True
+        ),
+        row=1, col=1
+    )
+
     fig.add_trace(
         go.Bar(
-    x=risk_totals['Risk_Category'],
-    y=risk_totals['Releases_Billion'],
-    marker=dict(color=colors, line=dict(color='white', width=1)),
-    text=[f"{v:.2f}B kg" for v in risk_totals['Releases_Billion']],
-    textposition='outside',
-    textfont=dict(size=11, color='#1e293b', family='Inter'),
-    showlegend=False,
-    hovertemplate='<b>%{x}</b><br>Volume: %{y:.4f} Billion kg<extra></extra>')
-),
-    
+            x=risk_totals['Risk_Category'],
+            y=risk_totals['Count'],
+            marker=dict(color=colors, line=dict(color='white', width=1)),
+            text=risk_totals['Count'],
+            textposition='outside',
+            textfont=dict(size=16, color='#1e293b', family='Inter'),
+            showlegend=False
+        ),
+        row=1, col=2
+    )
+
     fig.update_layout(
         height=450,
         showlegend=True,
@@ -835,14 +835,10 @@ def plot_risk_distribution_comprehensive(df):
         font=dict(family='Inter'),
         paper_bgcolor='rgba(0,0,0,0)'
     )
-    
+
     fig.update_xaxes(title_text='Risk Category', row=1, col=2)
-    fig.update_yaxes(
-    title_text='Total Releases (Billion kg, log scale)',
-    type='log',
-    row=1, col=2
-)
-    
+    fig.update_yaxes(title_text='Number of Pollutants', row=1, col=2)
+
     return fig
 
 def create_risk_classification_details():
@@ -1256,9 +1252,7 @@ def main():
         
         st.markdown("""
             <div class="warning-box-light">
-                <strong>Chart Explanation:</strong> The donut chart (left) shows what percentage of total emissions 
-                comes from each risk category. The bar chart (right) shows how many different pollutant types fall 
-                into each category.
+                <strong>Chart Explanation:</strong> The donut chart (left) shows what percentage of total emissions comes from each risk category. The bar chart (right) shows how many different pollutant types fall into each category.
             </div>
         """, unsafe_allow_html=True)
         

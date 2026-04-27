@@ -86,7 +86,11 @@ streamlit run dashboard.py
 ├── requirements.txt                # Python dependencies
 └── README.md
 ```
-
+Deploying to Streamlit Community Cloud
+Push all files (including F1_1_Air_Releases_National.csv) to your public GitHub repository
+Go to share.streamlit.io and sign in with GitHub
+Click New app → select your repository → set the main file to Dashboard.py
+Click Deploy — the app will be live in ~2 minutes
 ---
 
 ## Use cases

@@ -46,7 +46,7 @@ The 68 pollutants are manually classified into four risk categories based on WHO
 **Requirements:** Python 3.9+
 
 ```bash
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/sanujana2007/air-emissions-dashboard.git
 cd your-repo-name
 pip install -r requirements.txt
 streamlit run Dashboard.py
@@ -69,7 +69,7 @@ scipy
 Installation and setup:
 ```
 1. Clone the repository
-git clone https://github.com/YOUR-USERNAME/Air-Emissions-Dashboard.git
+git clone https://github.com/sanujana2007/air-emissions-dashboard.git
 cd Air-Emissions-Dashboard
 2. Install dependencies
 pip install -r requirements.txt

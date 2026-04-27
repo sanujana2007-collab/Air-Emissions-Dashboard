@@ -1,6 +1,6 @@
 # European Air Emissions Dashboard
 
-An interactive Streamlit dashboard for exploring industrial air pollutant releases across 32 European countries (2007–2024), built using data from the European Environment Agency.
+An interactive Streamlit Dashboard for exploring industrial air pollutant releases across 32 European countries (2007–2024), built using data from the European Environment Agency.
 This dashboard enables users to explore emission trends, identify high-risk pollutants, compare countries, and gain actionable environmental insights through dynamic visualizations.
 ---
 
